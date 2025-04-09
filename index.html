@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Göt Gürlemesi</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: linear-gradient(to top, #9be2fe, #67d1fb);
+      overflow: hidden;
+    }
+    #game {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #city {
+      width: 100%;
+      height: 150px;
+      background: #444;
+      position: relative;
+      overflow: hidden;
+    }
+    .person {
+      position: absolute;
+      bottom: 0;
+      font-size: 24px;
+      transition: transform 0.2s;
+    }
+    .popup {
+      position: absolute;
+      font-size: 32px;
+      animation: rise 1s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes rise {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-50px); }
+    }
+    @keyframes shake {
+      0% { transform: translate(1px, 1px); }
+      25% { transform: translate(-1px, -2px); }
+      50% { transform: translate(-3px, 1px); }
+      75% { transform: translate(3px, 2px); }
+      100% { transform: translate(1px, -1px); }
+    }
+    .shake { animation: shake 0.3s; }
+    #controls, #shop {
+      display: flex;
+      gap: 10px;
+      margin: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    #money {
+      font-size: 20px;
+      background: #fff;
+      padding: 5px 10px;
+      border-radius: 8px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="money">Para: 0 TL</div>
+    <div id="shop"></div>
+    <div id="city"></div>
+    <div id="controls">
+      <button onclick="moveLeft()">◀</button>
+      <button onclick="fart()">Osur!</button>
+      <button onclick="moveRight()">▶</button>
+    </div>
+  </div>
+
+  <!-- Sesler -->
+  <audio id="fartSound" src="sound/fart.mp3"></audio>
+  <audio id="aaaSound" src="sound/aaa.mp3"></audio>
+  <audio id="shitSound" src="sound/shit.mp3"></audio>
+  <audio id="fireFartSound" src="sound/hot-fart.mp3"></audio>
+  <audio id="magicFartSound" src="sound/magic-fart.mp3"></audio>
+
+  <script>
+    const city = document.getElementById("city");
+    const fartSound = document.getElementById("fartSound");
+    const aaaSound = document.getElementById("aaaSound");
+    const shitSound = document.getElementById("shitSound");
+    const fireFartSound = document.getElementById("fireFartSound");
+    const magicFartSound = document.getElementById("magicFartSound");
+
+    let people = [];
+    let moneyAmount = 0;
+    let currentFart = "💨";
+    let playerX = window.innerWidth / 2;
+
+    const items = [
+      { emoji: "💨", name: "Normal Osuruk", price: 100, earn: 10 },
+      { emoji: "🔥", name: "Ateşli Osuruk", price: 250, earn: 15 },
+      { emoji: "🌟", name: "Işıltılı Osuruk", price: 300, earn: 20 },
+      { emoji: "💩", name: "Büyük Sıçış", price: 500, earn: 30 }
+    ];
+
+    let currentFartItem = items[0];
+
+    function updateMoney() {
+      document.getElementById("money").innerText = `Para: ${moneyAmount} TL`;
+    }
+
+    function renderShop() {
+      const shop = document.getElementById("shop");
+      shop.innerHTML = "";
+      items.forEach(item => {
+        const btn = document.createElement("button");
+        btn.innerText = `${item.emoji} ${item.name} - ${item.price} TL`;
+        btn.onclick = () => buyItem(item.emoji);
+        shop.appendChild(btn);
+      });
+    }
+
+    function buyItem(emoji) {
+      const item = items.find(i => i.emoji === emoji);
+      if (!item) return;
+      if (moneyAmount >= item.price) {
+        moneyAmount -= item.price;
+        updateMoney();
+        currentFartItem = item;
+        currentFart = item.emoji;
+        showPopup(`${item.name} seçildi!`, "blue");
+      } else {
+        alert("Yeterli paran yok!");
+      }
+    }
+
+    function moveLeft() {
+      playerX -= 50;
+    }
+
+    function moveRight() {
+      playerX += 50;
+    }
+
+    function fart() {
+      if (currentFart === "💩") {
+        shitSound.currentTime = 0;
+        shitSound.play();
+        showPopup("SIÇTI!", "brown");
+        city.classList.add("shake");
+        setTimeout(() => city.classList.remove("shake"), 1000);
+        moneyAmount += currentFartItem.earn;
+      } else {
+        let soundToPlay;
+
+        if (currentFart === "💨") soundToPlay = fartSound;
+        else if (currentFart === "🔥") soundToPlay = fireFartSound;
+        else if (currentFart === "🌟") soundToPlay = magicFartSound;
+
+        if (soundToPlay) {
+          soundToPlay.currentTime = 0;
+          soundToPlay.play();
+        }
+
+        aaaSound.currentTime = 0;
+        aaaSound.play();
+        showPopup(`+${currentFartItem.earn}`, "green");
+        addPeople();
+        moneyAmount += currentFartItem.earn;
+      }
+      updateMoney();
+    }
+
+    function addPeople() {
+      const person = document.createElement("div");
+      person.classList.add("person");
+      person.innerText = "🧍‍♂️";
+      person.style.left = `${Math.random() * (window.innerWidth - 50)}px`;
+      city.appendChild(person);
+      people.push(person);
+      setTimeout(() => {
+        showPopup("AAA!", "red", person.offsetLeft, person.offsetTop);
+      }, 300);
+    }
+
+    function showPopup(text, color, x = playerX, y = window.innerHeight / 2) {
+      const popup = document.createElement("div");
+      popup.classList.add("popup");
+      popup.style.left = `${x}px`;
+      popup.style.top = `${y}px`;
+      popup.style.color = color;
+      popup.innerText = text;
+      document.body.appendChild(popup);
+      setTimeout(() => popup.remove(), 1000);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (["a", "ArrowLeft"].includes(e.key)) moveLeft();
+      else if (["d", "ArrowRight"].includes(e.key)) moveRight();
+      else if (e.key === "f") fart();
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderShop();
+      updateMoney();
+    });
+  </script>
+</body>
+</html>
