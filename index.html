@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Göt Gürlemesi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
   <style>
     body {
       margin: 0;
@@ -11,6 +14,7 @@
       background: linear-gradient(to top, #9be2fe, #67d1fb);
       overflow: hidden;
     }
+
     #game {
       position: relative;
       width: 100%;
@@ -20,6 +24,7 @@
       align-items: center;
       justify-content: space-between;
     }
+
     #city {
       width: 100%;
       height: 150px;
@@ -27,37 +32,68 @@
       position: relative;
       overflow: hidden;
     }
+
     .person {
       position: absolute;
       bottom: 0;
       font-size: 24px;
       transition: transform 0.2s;
     }
+
     .popup {
       position: absolute;
       font-size: 32px;
       animation: rise 1s ease-out forwards;
       pointer-events: none;
     }
+
     @keyframes rise {
-      0% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-50px); }
+      0% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
     }
+
     @keyframes shake {
-      0% { transform: translate(1px, 1px); }
-      25% { transform: translate(-1px, -2px); }
-      50% { transform: translate(-3px, 1px); }
-      75% { transform: translate(3px, 2px); }
-      100% { transform: translate(1px, -1px); }
+      0% {
+        transform: translate(1px, 1px);
+      }
+
+      25% {
+        transform: translate(-1px, -2px);
+      }
+
+      50% {
+        transform: translate(-3px, 1px);
+      }
+
+      75% {
+        transform: translate(3px, 2px);
+      }
+
+      100% {
+        transform: translate(1px, -1px);
+      }
     }
-    .shake { animation: shake 0.3s; }
-    #controls, #shop {
+
+    .shake {
+      animation: shake 0.3s;
+    }
+
+    #controls,
+    #shop {
       display: flex;
       gap: 10px;
       margin: 10px;
       flex-wrap: wrap;
       justify-content: center;
     }
+
     button {
       padding: 10px 15px;
       font-size: 16px;
@@ -65,8 +101,14 @@
       border-radius: 10px;
       cursor: pointer;
       background: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      margin: 20px 0;
     }
+
+    button.menu {
+      margin: 0;
+    }
+
     #money {
       font-size: 20px;
       background: #fff;
@@ -74,18 +116,48 @@
       border-radius: 8px;
       margin: 10px;
     }
+
+    .u1 li{
+      list-style-type: none;
+    }
+
+    #controls{
+      margin-bottom: 30px;
+    }
   </style>
 </head>
+
 <body>
   <div id="game">
     <div id="money">Para: 0 TL</div>
-    <div id="shop"></div>
-    <div id="city"></div>
-    <div id="controls">
-      <button onclick="moveLeft()">◀</button>
-      <button onclick="fart()">Osur!</button>
-      <button onclick="moveRight()">▶</button>
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample"
+      aria-controls="offcanvasExample">
+      Osuruklar
+    </button>
+    <div id="shop">
+
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample"
+        aria-labelledby="offcanvasExampleLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasExampleLabel">Offcanvas</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body u1">
+          
+        </div>
+      </div>
+
+
     </div>
+
+
+   
+  <div id="city"></div>
+  <div id="controls">
+    <button onclick="moveLeft()">◀</button>
+    <button onclick="fart()">Osur!</button>
+    <button onclick="moveRight()">▶</button>
+  </div>
   </div>
 
   <!-- Sesler -->
@@ -102,6 +174,7 @@
     const shitSound = document.getElementById("shitSound");
     const fireFartSound = document.getElementById("fireFartSound");
     const magicFartSound = document.getElementById("magicFartSound");
+
 
     let people = [];
     let moneyAmount = 0;
@@ -122,13 +195,21 @@
     }
 
     function renderShop() {
-      const shop = document.getElementById("shop");
-      shop.innerHTML = "";
+      const dropdownMenu = document.querySelector(".offcanvas-body.u1")
+      dropdownMenu.innerHTML = "";
       items.forEach(item => {
         const btn = document.createElement("button");
-        btn.innerText = `${item.emoji} ${item.name} - ${item.price} TL`;
+
+
+
+        btn.innerHTML = `
+        <li><a class="dropdown-item" href="#">
+          ${item.emoji} ${item.name} - ${item.price} TL
+          </a></li>
+        
+        `
         btn.onclick = () => buyItem(item.emoji);
-        shop.appendChild(btn);
+        dropdownMenu.appendChild(btn);
       });
     }
 
@@ -217,5 +298,15 @@
       updateMoney();
     });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.min.js"
+    integrity="sha384-VQqxDN0EQCkWoxt/0vsQvZswzTHUVOImccYmSyhJTp7kGtPed0Qcx8rK9h9YEgx+"
+    crossorigin="anonymous"></script>
 </body>
+
 </html>
